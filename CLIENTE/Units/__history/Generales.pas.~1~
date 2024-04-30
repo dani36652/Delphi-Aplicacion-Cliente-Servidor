@@ -1,0 +1,40 @@
+unit Generales;
+
+interface
+uses
+  {$IFDEF ANDROID}
+  Androidapi.JNI.Webkit, FMX.VirtualKeyboard,
+  Androidapi.JNI.Print, Androidapi.JNI.Util,
+  fmx.Platform.Android,
+  Androidapi.jni,fmx.helpers.android, Androidapi.Jni.app,
+  Androidapi.Jni.GraphicsContentViewText, Androidapi.JniBridge,
+  Androidapi.JNI.Os, Androidapi.Jni.Telephony,
+  Androidapi.JNI.JavaTypes,Androidapi.Helpers,
+  Androidapi.JNI.Widget,System.Permissions,
+  FMX.DialogService,Androidapi.Jni.Provider,Androidapi.Jni.Net,
+  fmx.TextLayout,AndroidAPI.JNI.Support,
+  {$ENDIF}
+  System.Classes, FMX.Forms, FMX.Platform, System.Messaging, FMX.Objects,
+  IdGlobal,{$IFDEF MSWINDOWS} IdHTTP, WinApi.UrlMon, Winapi.ShellAPI,
+  Winapi.Windows, FMX.Platform.Win,{$ENDIF} FMX.ComboEdit, FMX.NumberBox,
+  System.Types, System.StrUtils, FMX.Dialogs, System.SysUtils, System.UITypes,
+  FMX.Types, FMX.Controls;
+
+procedure Sincronizar(AProc: TProc);
+
+implementation
+
+procedure Sincronizar(AProc: TProc);
+begin
+  if CurrentThreadId = MainThreadID then
+    AProc else
+  begin
+    TThread.Synchronize(nil,
+    procedure
+    begin
+      AProc;
+    end);
+  end;
+end;
+
+end.

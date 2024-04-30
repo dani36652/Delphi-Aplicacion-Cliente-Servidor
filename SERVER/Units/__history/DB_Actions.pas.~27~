@@ -1,0 +1,420 @@
+unit DB_Actions;
+
+interface
+uses
+  System.Classes, System.Types, System.SysConst, System.SysUtils, System.StrUtils,
+  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error,
+  FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool,
+  FireDAC.Stan.Async, FireDAC.Phys, FireDAC.Phys.SQLite, FireDAC.Phys.SQLiteDef,
+  FireDAC.Stan.ExprFuncs, FireDAC.Phys.SQLiteWrapper.Stat, FireDAC.VCLUI.Wait,
+  FireDAC.DApt, Data.DB, FireDAC.Comp.Client, System.JSON, System.JSON.Builders,
+  System.JSON.Types, System.JSON.Converters;
+
+function CrearTablas(Conexion: TFDConnection): boolean;
+function ConectarDB(Conexion: TFDConnection): boolean;
+procedure IngresarInfoDePrueba(Conexion: TFDConnection);
+
+function getClientesJSONString(Conexion: TFDConnection): string;
+function getProveedoresJSONString(Conexion: TFDConnection): string;
+function getGerentesJSONString(Conexion: TFDConnection): string;
+function getProductosJSONString(Conexion: TFDConnection): string;
+
+implementation
+uses
+  Generales, System.IOUtils;
+
+function CrearTablas(Conexion: TFDConnection): boolean;
+var
+  Qry: TFDQuery;
+  SQL: string;
+begin
+  if ConectarDB(Conexion) then
+  begin
+    Qry:= TFDQuery.Create(nil);
+    try
+      try
+        Qry.Connection:= Conexion;
+        Qry.SQL.Clear;
+        SQL:= 'CREATE TABLE IF NOT EXISTS clientes(id INTEGER PRIMARY KEY, nombre TEXT, ' +
+        'apellido TEXT, edad INTEGER, sexo TEXT)';
+        Qry.SQL.Text:= SQL;
+        Qry.ExecSQL;
+
+        SQL:= 'CREATE TABLE IF NOT EXISTS productos(id INTEGER PRIMARY KEY, ' +
+        'descripcion TEXT, existencia INTEGER, precio_compra DOUBLE, precio_venta DOUBLE)';
+        Qry.SQL.Text:= SQL;
+        Qry.ExecSQL;
+
+        SQL:= 'CREATE TABLE IF NOT EXISTS proveedores(id INTEGER PRIMARY KEY, nombre TEXT, ' +
+        'apellido TEXT, edad INTEGER, sexo TEXT)';
+        Qry.SQL.Text:= SQL;
+        Qry.ExecSQL;
+
+        SQL:= 'CREATE TABLE IF NOT EXISTS gerentes(id INTEGER PRIMARY KEY, nombre TEXT, ' +
+        'apellido TEXT, edad INTEGER, sexo TEXT)';
+        Qry.SQL.Text:= SQL;
+        Qry.ExecSQL;
+
+        Result:= True;
+      except on E: exception do
+        begin
+          EscribirLogExcepciones(E.ClassName + ': ' + E.Message);
+          Result:= False;
+        end;
+      end;
+    finally
+      Qry.Close;
+      FreeAndNil(Qry);
+    end;
+  end else Result:= False;
+end;
+
+function ConectarDB(Conexion: TFDConnection): boolean;
+var
+  DBFilePath: string;
+begin
+  DBFilePath:= ExtractFileDir(ParamStr(0)) + PathDelim + 'database.db';
+  try
+    Conexion.Params.Values['Database']:= DBFilePath;
+    Conexion.Params.Values['DriverID']:= 'SQLite';
+    Conexion.Connected:= True;
+    Result:= True;
+  except on E: exception do
+    begin
+      EscribirLogExcepciones(E.ClassName + ': ' + E.Message);
+      Result:= False;
+    end;
+  end;
+end;
+
+procedure IngresarInfoDePrueba(Conexion: TFDConnection);
+var
+  Qry: TFDQuery;
+  SQLClientes, SQLProveedores,
+  SQLGerentes, SQLProductos, SQLDrop: string;
+  i: integer;
+  TxtDataSetPath: string;
+  StrNombres, StrApellidos, StrProductos: TStringList;
+begin
+  (*
+    Para el ejercicio se tiene un set de datos en archivos txt que deberán
+    estar en la misma ruta que el ejecutable.
+  *)
+  TxtDataSetPath:= ExtractFileDir(ParamStr(0));
+  if (TFile.Exists(TxtDataSetPath + PathDelim + 'Nombres.txt')) and
+  (TFile.Exists(TxtDataSetPath + PathDelim + 'Apellidos.txt')) and
+  (TFile.Exists(TxtDataSetPath + PathDelim + 'Productos.txt')) then
+  begin
+    Qry:= TFDQuery.Create(nil);
+    StrNombres:= TStringList.Create;
+    StrApellidos:= TStringList.Create;
+    StrProductos:= TStringList.Create;
+    try
+      try
+        Qry.Connection:= Conexion;
+        Qry.SQL.Clear;
+        (*  INSERTAR DATOS CON LOS NOMBRES clientes, proveedores, gerentes
+            Nombres.txt y Apellidos.txt tienen el mismo número de líneas
+        *)
+        StrNombres.LoadFromFile(TxtDataSetPath + PathDelim + 'Nombres.txt');
+        StrNombres.Text:= UTF8ToString(RawByteString(StrNombres.Text));
+
+        StrApellidos.LoadFromFile(TxtDataSetPath + PathDelim + 'Apellidos.txt');
+        StrApellidos.Text:= UTF8ToString(RawByteSTring(StrApellidos.Text));
+
+        StrProductos.LoadFromFile(TxtDataSetPath + PathDelim + 'Productos.txt');
+        StrProductos.Text:= UTF8ToString(RawByteString(StrProductos.Text));
+        Conexion.StartTransaction;
+        if StrNombres.Count > 0 then
+        begin
+          Randomize;
+          SQLClientes:= 'INSERT INTO clientes (id,nombre, apellido, edad, sexo) VALUES ';
+          SQLProveedores:= 'INSERT INTO proveedores (id,nombre, apellido, edad, sexo) VALUES ';
+          SQLGerentes:= 'INSERT INTO gerentes (id,nombre, apellido, edad, sexo) VALUES ';
+          for i:= 0 to StrNombres.Count - 1 do
+          begin
+            if i < StrNombres.Count - 1 then
+            begin
+              SQLClientes:= SQLClientes + '(NULL, "' + StrNombres[i] + '", "' + StrApellidos[i] + '", ' +
+              IntToStr(Random(50) + 1) + ', "Unknown"),' + sLineBreak;
+
+              SQLProveedores:= SQLProveedores + '(NULL, "' + StrNombres[i] + '", "' + StrApellidos[i] + '", ' +
+              IntToStr(Random(50) + 1) + ', "Unknown"),' + sLineBreak;
+
+              SQLGerentes:= SQLGerentes + '(NULL, "' + StrNombres[i] + '", "' + StrApellidos[i] + '", ' +
+              IntToStr(Random(50) + 1) + ', "Unknown"),' + sLineBreak;
+            end else
+            if i = StrNombres.Count - 1 then
+            begin
+              SQLClientes:= SQLClientes + '(NULL, "' + StrNombres[i] + '", "' + StrApellidos[i] + '", ' +
+              IntToStr(Random(50) + 1) + ', "Unknown")';
+
+              SQLProveedores:= SQLProveedores + '(NULL, "' + StrNombres[i] + '", "' + StrApellidos[i] + '", ' +
+              IntToStr(Random(50) + 1) + ', "Unknown")';
+
+              SQLGerentes:= SQLGerentes + '(NULL, "' + StrNombres[i] + '", "' + StrApellidos[i] + '", ' +
+              IntToStr(Random(50) + 1) + ', "Unknown")';
+            end;
+          end;
+
+          //COMO SE TRATA DE UN EJERCICIO BREVE DE PRUEBA, SE LIMPIAN LOS DATOS Y SE REINSERTAN
+          //CADA VEZ QUE SE HACE USO DEL PROGRAMA
+          SQLDrop:= 'DELETE FROM clientes';
+          Qry.SQL.Text:= SQLDrop;
+          Qry.ExecSQL;
+
+          SQLDrop:= 'DELETE FROM proveedores';
+          Qry.SQL.Text:= SQLDrop;
+          Qry.ExecSQL;
+
+          SQLDrop:= 'DELETE FROM gerentes';
+          Qry.SQL.Text:= SQLDrop;
+          Qry.ExecSQL;
+
+          Qry.SQL.Text:= SQLClientes;
+          Qry.ExecSQL;
+          Qry.SQL.Text:= SQLProveedores;
+          Qry.ExecSQL;
+          Qry.SQL.Text:= SQLGerentes;
+          Qry.ExecSQL;
+        end;
+
+        if StrProductos.Count > 0 then
+        begin
+          Randomize;
+          SQLProductos:= 'INSERT into productos (id, descripcion, existencia, precio_compra, ' +
+          'precio_venta) VALUES ';
+          for i:= 0 to StrProductos.Count - 1 do
+          begin
+            if i < StrProductos.Count - 1 then
+            begin
+              SQLProductos:= SQLProductos +
+              '(NULL, "' + StrProductos[i] + '", ' + IntToStr(Random(260)) + ', ' +
+              FloatToStr((Random(600) + 1 ) / 2) + ', ' + FloatToStr((Random(450) + 1 ) / 2) +
+              '),' + sLineBreak;
+            end else
+            if i = StrProductos.Count - 1 then
+            begin
+              SQLProductos:= SQLProductos +
+              '(NULL, "' + StrProductos[i] + '", ' + IntToStr(Random(260)) + ', ' +
+              FloatToStr((Random(600) + 1 ) / 2) + ', ' + FloatToStr((Random(450) + 1 ) / 2) +
+              ')';
+            end;
+          end;
+
+          SQLDrop:= 'DELETE FROM productos';
+          Qry.SQL.Clear;
+          Qry.SQL.Text:= SQLDrop;
+          Qry.ExecSQL;
+
+          Qry.SQL.Clear;
+          Qry.SQL.Text:= SQLProductos;
+          Qry.ExecSQL;
+        end;
+
+        Conexion.Commit;
+      except on E: exception do
+        begin
+          Conexion.Rollback;
+          EscribirLogExcepciones(E.ClassName + ': ' + E.Message);
+        end;
+      end;
+    finally
+      StrNombres.Clear;
+      StrApellidos.Clear;
+      StrProductos.Clear;
+      FreeAndNil(StrNombres);
+      FreeAndNil(StrApellidos);
+      FreeAndNil(StrProductos);
+    end;
+  end;
+end;
+
+function getClientesJSONString(Conexion: TFDConnection): string;
+var
+  JSONObj, JSONObjCliente: TJSONObject;
+  JArrayClientes: TJSONArray;
+  QryClientes: TFDQuery;
+  SQL: string;
+begin
+  JSONObj:= TJSONObject.Create;
+  JArrayClientes:= TJSONArray.Create;
+  QryClientes:= TFDQuery.Create(nil);
+  try
+    try
+      QryClientes.Connection:= Conexion;
+      SQL:= 'SELECT * FROM clientes';
+      QryClientes.SQL.Clear;
+      QryClientes.SQL.Text:= SQL;
+      QryClientes.Open;
+      if QryClientes.RecordCount > 0 then
+      begin
+        QryClientes.First;
+        JSONObj.AddPair('clientes', JArrayClientes);
+        while not QryClientes.Eof do
+        begin
+          JSONObjCliente:= TJSONObject.Create;
+          JSONObjCliente.AddPair('id', TJSONNumber.Create(QryClientes.FieldByName('id').AsString));
+          JSONObjCliente.AddPair('nombre', QryClientes.FieldByName('nombre').AsString);
+          JSONObjCliente.AddPair('apellido', QryClientes.FieldByName('apellido').AsString);
+          JSONObjCliente.AddPair('edad', TJSONNumber.Create(QryClientes.FieldByName('edad').AsString));
+          JSONObjCliente.AddPair('sexo', QryClientes.FieldByName('sexo').AsString);
+          JArrayClientes.Add(JSONObjCliente);
+          QryClientes.Next;
+        end;
+        Result:= JSONObj.ToString;
+      end else Result:= string.Empty;
+    except on E: exception do
+      begin
+        EscribirLogExcepciones(E.ClassName + ': ' + E.Message);
+        Result:= string.Empty;
+      end;
+    end;
+  finally
+    QryClientes.Close;
+    FreeAndNil(QryClientes);
+
+    if Assigned(JSONObj) then
+      FreeAndNil(JSONObj);
+  end;
+end;
+
+function getProveedoresJSONString(Conexion: TFDConnection): string;
+var
+  JSONObj, JSONObjProveedor: TJSONObject;
+  JArrayProveedores: TJSONArray;
+  QryProveedores: TFDQuery;
+  SQL: string;
+begin
+  JSONObj:= TJSONObject.Create;
+  JArrayProveedores:= TJSONArray.Create;
+  QryProveedores:= TFDQuery.Create(nil);
+  try
+    try
+      QryProveedores.Connection:= Conexion;
+      SQL:= 'SELECT * FROM proveedores';
+      QryProveedores.SQL.Clear;
+      QryProveedores.SQL.Text:= SQL;
+      QryProveedores.Open;
+      if QryProveedores.RecordCount > 0 then
+      begin
+        QryProveedores.First;
+        JSONObj.AddPair('proveedores', JArrayProveedores);
+        while not QryProveedores.Eof do
+        begin
+          JSONObjProveedor:= TJSONObject.Create;
+          JSONObjProveedor.AddPair('id', TJSONNumber.Create(QryProveedores.FieldByName('id').AsString));
+          JSONObjProveedor.AddPair('nombre', QryProveedores.FieldByName('nombre').AsString);
+          JSONObjProveedor.AddPair('apellido', QryProveedores.FieldByName('apellido').AsString);
+          JSONObjProveedor.AddPair('edad', TJSONNumber.Create(QryProveedores.FieldByName('edad').AsString));
+          JSONObjProveedor.AddPair('sexo', QryProveedores.FieldByName('sexo').AsString);
+          JArrayProveedores.Add(JSONObjProveedor);
+          QryProveedores.Next;
+        end;
+        Result:= JSONObj.ToString;
+      end else Result:= string.Empty;
+    except on E: exception do
+      begin
+        EscribirLogExcepciones(E.ClassName + ': ' + E.Message);
+        Result:= string.Empty;
+      end;
+    end;
+  finally
+    QryProveedores.Close;
+    FreeAndNil(QryProveedores);
+
+    if Assigned(JSONObj) then
+      FreeAndNil(JSONObj);
+  end;
+end;
+
+function getGerentesJSONString(Conexion: TFDConnection): string;
+var
+  JSONObj, JSONObjGerente: TJSONObject;
+  JArrayGerentes: TJSONArray;
+  QryGerentes: TFDQuery;
+  SQL: string;
+begin
+  JSONObj:= TJSONObject.Create;
+  JArrayGerentes:= TJSONArray.Create;
+  QryGerentes:= TFDQuery.Create(nil);
+  try
+    try
+      QryGerentes.Connection:= Conexion;
+      SQL:= 'SELECT * FROM gerentes';
+      QryGerentes.SQL.Clear;
+      QryGerentes.SQL.Text:= SQL;
+      QryGerentes.Open;
+      if QryGerentes.RecordCount > 0 then
+      begin
+        QryGerentes.First;
+        JSONObj.AddPair('gerentes', JArrayGerentes);
+        while not QryGerentes.Eof do
+        begin
+          JSONObjGerente:= TJSONObject.Create;
+          JSONObjGerente.AddPair('id', TJSONNumber.Create(QryGerentes.FieldByName('id').AsString));
+          JSONObjGerente.AddPair('nombre', QryGerentes.FieldByName('nombre').AsString);
+          JSONObjGerente.AddPair('apellido', QryGerentes.FieldByName('apellido').AsString);
+          JSONObjGerente.AddPair('edad', TJSONNumber.Create(QryGerentes.FieldByName('edad').AsString));
+          JSONObjGerente.AddPair('sexo', QryGerentes.FieldByName('sexo').AsString);
+          JArrayGerentes.Add(JSONObjGerente);
+          QryGerentes.Next;
+        end;
+        Result:= JSONObj.ToString;
+      end else Result:= string.Empty;
+    except on E: exception do
+      begin
+        EscribirLogExcepciones(E.ClassName + ': ' + E.Message);
+        Result:= string.Empty;
+      end;
+    end;
+  finally
+    QryGerentes.Close;
+    FreeAndNil(QryGerentes);
+
+    if Assigned(JSONObj) then
+      FreeAndNil(JSONObj);
+  end;
+end;
+
+function getProductosJSONString(Conexion: TFDConnection): string;
+var
+  JSONObj, JSONObjProducto: TJSONObject;
+  JArrayProductos: TJSONArray;
+  QryProductos: TFDQuery;
+  SQL: string;
+begin
+  JSONObj:= TJSONObject.Create;
+  JSONObjProducto:= TJSONObject.Create;
+  JArrayProductos:= TJSONArray.Create;
+  QryProductos:= TFDQuery.Create(nil);
+  try
+    try
+      QryProductos.Connection:= Conexion;
+      SQL:= 'SELECT * FROM productos';
+      QryProductos.SQL.Clear;
+      QryProductos.SQL.Text:= SQL;
+      QryProductos.Open;
+      if QryProductos.RecordCount > 0 then
+      begin
+        JSONObj.AddPair('productos', JArrayProductos);
+        QryProductos.First;
+        while not QryProductos.Eof do
+        begin
+          JSONObjProducto:= TJSONObject.Create;
+          JSONObjProducto.AddPair('id', TJSONNumber.Create(QryProductos.FieldByName('id').AsString));
+          JSONObjProducto.AddPair('descripcion', QryProductos.FieldByName('descripcion').AsString);
+          JSONObjProducto.AddPair('existencia', TJSONNumber.Create(QryProductos.FieldByName('existencia').AsString));
+          JSONObjProducto.AddPair('precio_compra', TJSONNumber.Create(QryProductos.FieldByName('precio_compra').AsString));
+          JSONObjProducto.AddPair('precio_venta', TJSONNumber.Create(QryProductos.FieldByName('precio_venta').AsString));
+        end;
+      end;
+    except
+
+    end;
+  finally
+
+  end;
+end;
+
+end.

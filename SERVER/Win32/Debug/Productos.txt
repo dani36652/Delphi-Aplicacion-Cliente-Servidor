@@ -1,0 +1,310 @@
+Galletas de chocolate  
+Refresco de cola  
+Papas fritas sabor a queso  
+Yogur de fresa  
+Helado de vainilla  
+Cereal de miel y almendras  
+Chocolate con avellanas  
+Jugo de naranja  
+Pan de trigo integral  
+Mermelada de frambuesa  
+Aceite de oliva virgen  
+Queso fresco  
+Cerveza artesanal  
+Salsa de tomate  
+Té verde con limón  
+Mantequilla de maní  
+Pastel de zanahoria  
+Palomitas de maíz  
+Café tostado  
+Pasta de dientes de menta  
+Caramelos de menta  
+Crema de cacahuate  
+Leche desnatada  
+Miel de abeja  
+Tortillas de maíz  
+Sal de mar  
+Pimientos enlatados  
+Cereal de arroz inflado  
+Tacos de pescado  
+Café descafeinado  
+Agua mineral con gas  
+Pimienta molida  
+Champiñones en conserva  
+Pavo ahumado  
+Ensalada de frutas  
+Cereal de avena  
+Barras de granola  
+Lechuga romana  
+Atún en lata  
+Zanahorias baby  
+Manzanas verdes  
+Pan integral de centeno  
+Almendras tostadas  
+Sopa de pollo en lata  
+Gelatina de fresa  
+Salchichas de pavo  
+Aceitunas verdes  
+Sándwich de pollo  
+Salsa picante  
+Arroz blanco  
+Pasta de tomate  
+Cerveza sin alcohol  
+Café instantáneo  
+Panecillos de ajo  
+Zumo de manzana  
+Vinagre balsámico  
+Cebollas rojas  
+Espinacas frescas  
+Pechuga de pollo  
+Galletas saladas  
+Guisantes enlatados  
+Crema de champiñones  
+Plátanos maduros  
+Melocotones en almíbar  
+Arroz integral  
+Salmón ahumado  
+Salsa de soja  
+Helado de fresa  
+Pan de molde integral  
+Nueces de Brasil  
+Pasta de almendras  
+Judías verdes  
+Té de hierbas  
+Sopa de tomate en lata  
+Pollo asado  
+Aceite de coco  
+Hamburguesas vegetarianas  
+Salsa de arándanos  
+Chorizo español  
+Gazpacho andaluz  
+Panecillos de chocolate  
+Cereales de maíz  
+Pasta de dientes de menta  
+Cerveza artesanal  
+Salsa de tomate picante  
+Té de limón  
+Tostadas de trigo integral  
+Yogur de vainilla  
+Salsa de queso  
+Café de Colombia  
+Galletas de avena  
+Crema de cacahuete  
+Gelatina de frutas  
+Ensalada mixta  
+Pasta al pesto  
+Pechuga de pavo  
+Aceitunas negras  
+Arroz basmati  
+Chips de plátano  
+Pepinos frescos  
+Salsa ranchera  
+Leche de almendras  
+Mantequilla de almendra  
+Té chai  
+Sopa de verduras  
+Galletas integrales  
+Helado de chocolate  
+Pan de centeno  
+Queso cheddar  
+Salsa barbacoa  
+Café espresso  
+Palitos de cangrejo  
+Mantequilla de coco  
+Té de jengibre  
+Salsa de aguacate  
+Salmón fresco  
+Salsa de queso azul  
+Tacos de carne asada  
+Galletas de mantequilla  
+Cereal de frutas  
+Crema de calabaza  
+Sopa de cebolla  
+Huevos orgánicos  
+Pasta de curry  
+Café americano  
+Galletas de avena y pasas  
+Yogur griego  
+Salsa de mostaza  
+Pan de espelta  
+Leche de coco  
+Sopa de miso  
+Tarta de manzana  
+Café con leche  
+Salsa de chile  
+Galletas de canela  
+Pasta de sésamo  
+Salsa de albahaca  
+Té de menta  
+Salmón ahumado  
+Tarta de chocolate  
+Café turco  
+Galletas de jengibre  
+Salsa de arroz  
+Pan de maíz  
+Leche condensada  
+Guiso de lentejas  
+Salsa de pimienta  
+Té negro  
+Salmón en conserva  
+Salsa tártara  
+Pan de ajo  
+Leche de soja  
+Gelatina de limón  
+Salsa de carne  
+Té de manzanilla  
+Salmón fresco  
+Salsa de cacahuete  
+Pan de nueces  
+Leche de avena  
+Gazpacho de remolacha  
+Té de canela  
+Salmón a la parrilla  
+Salsa de caramelo  
+Pan de pasas  
+Leche evaporada  
+Sopa de maíz  
+Té de lavanda  
+Salmón en escabeche  
+Salsa de cilantro  
+Pan de centeno integral  
+Leche de cabra  
+Sopa de pollo casera  
+Té de frutas rojas  
+Salmón marinado  
+Salsa de hoisin  
+Pan de cerveza  
+Leche de arroz  
+Sopa de almejas  
+Té de limón y jengibre  
+Salmón al horno  
+Salsa de anacardos  
+Pan de queso  
+Leche de almendras casera  
+Sopa de champiñones  
+Té de jazmín  
+Salmón a la plancha  
+Salsa de mostaza y miel  
+Pan de maíz y jalapeño  
+Leche de avellanas  
+Sopa de tomate casera  
+Té de frutas del bosque  
+Salmón en papillote  
+Salsa de pesto casera  
+Pan de trigo sarraceno  
+Leche de avena casera  
+Sopa de guisantes  
+Té de rooibos  
+Salmón a la parrilla  
+Salsa de yogur y pepino  
+Pan de centeno integral  
+Leche de coco casera  
+Sopa de calabaza casera  
+Té de hierbas relajante
+Pizza hawaiana  
+Refresco de lima-limón  
+Papas fritas sabor a barbacoa  
+Yogur de vainilla  
+Helado de fresa  
+Cereal de coco y almendras  
+Chocolate con menta  
+Jugo de piña  
+Pan de masa madre  
+Mermelada de moras  
+Aceite de aguacate  
+Queso azul  
+Cerveza negra  
+Salsa de curry  
+Té verde con jazmín  
+Mantequilla de avellana  
+Pastel de vainilla con chocolate  
+Palomitas de maíz dulces  
+Café brasileño  
+Pasta de dientes de hierbabuena  
+Caramelos de frutas  
+Crema de cacahuete y chocolate  
+Leche de soja  
+Miel de lavanda  
+Tortillas de maíz azul  
+Sal rosa del Himalaya  
+Pimientos en vinagre  
+Cereal de trigo integral  
+Tacos de pollo  
+Café italiano  
+Agua mineral con limón  
+Pimienta blanca molida  
+Champiñones en salsa  
+Pavo ahumado al chipotle  
+Ensalada de quinoa  
+Cereal de arroz con miel  
+Barritas de cereales con chocolate  
+Lechuga romana  
+Atún en agua  
+Zanahorias baby orgánicas  
+Manzanas rojas  
+Pan de espelta integral  
+Nueces pecanas  
+Galletas de avena y chocolate blanco  
+Crema de almendra y coco  
+Gelatina de uva  
+Ensalada caprese  
+Cereal de trigo sarraceno  
+Barritas de granola con frutas  
+Lechuga de hoja de roble  
+Atún en aceite de girasol  
+Zanahorias orgánicas baby  
+Manzanas granny smith  
+Pan de masa madre integral  
+Nueces de macadamia  
+Galletas de avena y pasas  
+Crema de avellanas y cacao  
+Gelatina de mango  
+Ensalada césar  
+Cereal de quinoa con frutas  
+Barritas de granola con chocolate  
+Lechuga iceberg  
+Atún en aceite de oliva virgen extra  
+Zanahorias baby  
+Manzanas golden  
+Pan de centeno integral con semillas  
+Nueces de pecana  
+Galletas de avena con chips de chocolate  
+Crema de almendra tostada  
+Gelatina de piña  
+Ensalada de espinacas y fresas  
+Cereal de espelta  
+Barritas de avena y miel  
+Lechuga batavia  
+Atún en aceite de oliva virgen  
+Zanahorias orgánicas baby  
+Manzanas pink lady  
+Pan de centeno con semillas de lino  
+Nueces de macadamia tostadas  
+Galletas de avena y pasas  
+Crema de avellanas tostadas  
+Gelatina de melocotón  
+Ensalada de rúcula y parmesano  
+Cereal de cebada  
+Barritas de frutos secos y miel  
+Lechuga trocadero  
+Atún en aceite de oliva virgen extra  
+Zanahorias baby orgánicas  
+Manzanas royal gala  
+Pan de centeno integral con nueces  
+Nueces de pecana tostadas  
+Galletas de avena con trozos de chocolate  
+Crema de avellanas tostadas y cacao  
+Gelatina de maracuyá  
+Ensalada de canónigos y frutos rojos  
+Cereal de mijo  
+Barritas de avena con arándanos  
+Lechuga romana  
+Atún en aceite de girasol  
+Zanahorias orgánicas baby  
+Manzanas rojas  
+Pan de centeno integral  
+Nueces de macadamia  
+Galletas de avena y pasas  
+Crema de almendras y miel  
+Gelatina de naranja  
+Ensalada de rúcula y tomate cherry  

@@ -1,0 +1,45 @@
+unit Generales;
+
+interface
+uses
+  System.Classes, System.Types, System.SysConst, System.SysUtils, System.StrUtils,
+  System.Generics.Collections, idStack;
+
+function GetLocalIPAddress: string;
+procedure EscribirLogExcepciones(Mensaje: string);
+
+implementation
+uses
+  System.IOUtils;
+
+function GetLocalIPAddress: string;
+begin
+  TIdStack.IncUsage;
+  try
+    try
+      Result:= GStack.LocalAddress;
+    except on E: exception do
+      EscribirLogExcepciones(E.ClassName + ': ' + E.Message);
+    end;
+  finally
+    TIdStack.DecUsage;
+  end;
+end;
+
+procedure EscribirLogExcepciones(Mensaje: string);
+var
+  FileName: string;
+  F: TextFile;
+begin
+  FileName := TPath.Combine(ExtractFilePath(ParamStr(0)),
+  'Log.txt');
+  AssignFile(F, FileName);
+  if FileExists(FileName) then
+    Append(F)
+  else
+    Rewrite(F);
+  writeln(F, FormatDateTime('DD/MM/YYYY hh:nn:ss', Now) + '-' + Mensaje);
+  CloseFile(F);
+end;
+
+end.

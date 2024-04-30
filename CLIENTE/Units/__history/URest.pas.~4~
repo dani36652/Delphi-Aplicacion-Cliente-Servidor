@@ -1,0 +1,134 @@
+unit URest;
+
+interface
+
+Uses
+  System.Types, System.SysConst, System.StrUtils, System.Generics.Collections,
+  System.Classes, System.SysUtils, System.Net.URLClient, System.Net.HttpClient,
+  System.Net.HttpClientComponent;
+
+type
+  RRespuesta = Record
+  Code: Integer;
+  Code_Descrip: String;
+  Mensaje: String;
+End;
+
+type TREST=Class(TComponent)
+  private
+    Client: TNetHTTPClient;
+    Request: TNetHTTPRequest;
+    HttpRespuesta: RRespuesta;
+    //Headers: TNetHeaders;
+    procedure NetHTTPClientRequestError(const Sender: TObject; const AError: string);
+    procedure ProcesarRespuesta(Response: IHTTPResponse);
+    procedure InicializarRespuesta;
+    //No usar en un ambiente de producción por motivos de seguridad
+    Procedure OnValidateCert(const Sender: TObject; const ARequest: TURLRequest; const Certificate: TCertificate; var Accepted: Boolean);
+  public
+    BaseURL: String;
+    Constructor Create(AOwner: TCOmponent); Override;
+    Procedure POST(jstr: String; EndPoint: string; Params: String = '');
+    Procedure GET(Params: String; EndPoint: string);
+    Property Respuesta: RRespuesta Read HttpRespuesta;
+    procedure SetBaseURL(URL: string);
+End;
+
+implementation
+uses UPrincipal, FMX.Dialogs;
+
+{ tRestPOS }
+
+constructor TREST.Create(AOwner: TCOmponent);
+begin
+  inherited Create(AOwner);
+  Client := TNetHTTPClient.Create(self);
+  Client.OnRequestError := NetHTTPClientRequestError;
+  Client.OnValidateServerCertificate := OnValidateCert;
+  Request := TNetHTTPRequest.Create(self);
+  Request.ResponseTimeout:= 10000;
+  Request.ConnectionTimeout:= 10000;
+
+  Client.UserAgent := 'Mozilla/5.0';
+  Client.Accept := 'text/plain';
+  Client.ContentType := 'application/json;';
+  Client.AcceptCharSet := 'UTF-8';
+  Client.ResponseTimeout:= 10000;
+  Client.ConnectionTimeout:= 10000;
+  //SetLength(Headers, 0);
+end;
+
+procedure TREST.GET(Params: String; EndPoint: string);
+var
+  resp: TMemoryStream;
+  res: IHTTPResponse;
+  URL: String;
+begin
+  InicializarRespuesta;
+
+  URL:= BaseURL + EndPoint + Params;
+  resp := TMemoryStream.Create;
+
+  try
+    res := Client.Get(URL, resp);
+  finally
+    if Assigned(res) then
+      ProcesarRespuesta(res);
+  end;
+end;
+
+procedure TREST.InicializarRespuesta;
+begin
+  HttpRespuesta.Code := 0;
+  HttpRespuesta.Mensaje := '';
+end;
+
+procedure TREST.NetHTTPClientRequestError(const Sender: TObject;
+  const AError: string);
+begin
+  HttpRespuesta.Code := 500;
+  HttpRespuesta.Mensaje := AError;
+end;
+
+procedure TREST.OnValidateCert(const Sender: TObject;
+  const ARequest: TURLRequest; const Certificate: TCertificate;
+  var Accepted: Boolean);
+begin
+  //No usar en un ambiente de producción por motivos de seguridad
+  Accepted := true;
+end;
+
+procedure TREST.POST(jstr: String; EndPoint: string; Params: String = '');
+var
+  body: TStringStream;
+  resp: TMemoryStream;
+  res: IHTTPResponse;
+  URL: String;
+begin
+  InicializarRespuesta;
+  URL:= BaseURL + EndPoint;
+
+  body := TStringStream.Create(jstr);
+  resp := TMemoryStream.Create;
+
+  try
+      res := Client.Post(URL, body, resp);
+  finally
+    if Assigned(res) then
+      ProcesarRespuesta(res);
+  end;
+end;
+
+procedure TREST.ProcesarRespuesta(Response: IHTTPResponse);
+begin
+  HttpRespuesta.Code := Response.StatusCode;
+  HttpRespuesta.Code_Descrip := Response.StatusText;
+  HttpRespuesta.Mensaje := Response.ContentAsString;
+end;
+
+procedure TREST.SetBaseURL(URL: string);
+begin
+  BaseURL:= URL;
+end;
+
+end.

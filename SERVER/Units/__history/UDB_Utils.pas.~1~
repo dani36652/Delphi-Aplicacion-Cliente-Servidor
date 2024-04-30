@@ -1,0 +1,83 @@
+unit UDB_Utils;
+
+interface
+uses
+  System.Classes, System.Types, System.SysConst, System.SysUtils, System.StrUtils,
+  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error,
+  FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool,
+  FireDAC.Stan.Async, FireDAC.Phys, FireDAC.Phys.SQLite, FireDAC.Phys.SQLiteDef,
+  FireDAC.Stan.ExprFuncs, FireDAC.Phys.SQLiteWrapper.Stat, FireDAC.VCLUI.Wait,
+  Data.DB, FireDAC.Comp.Client;
+
+function CrearTablas(Conexion: TFDConnection): boolean;
+function ConectarDB(Conexion: TFDConnection): boolean;
+
+implementation
+uses
+  Generales, System.IOUtils;
+
+function CrearTablas(Conexion: TFDConnection): boolean;
+var
+  Qry: TFDQuery;
+  SQL: string;
+begin
+  if ConectarDB(Conexion) then
+  begin
+    Qry:= TFDQuery.Create(nil);
+    try
+      try
+        Qry.Connection:= Conexion;
+        Qry.SQL.Clear;
+        SQL:= 'CREATE TABLE IF NOT EXISTS clientes(id INTEGER PRIMARY KEY, nombre TEXT, ' +
+        'apellido TEXT, edad INTEGER, sexo TEXT)';
+        Qry.SQL.Text:= SQL;
+        Qry.ExecSQL;
+
+        SQL:= 'CREATE TABLE IF NOT EXISTS productos(id INTEGER PRIMARY KEY, ' +
+        'descripcion TEXT, existencia INTEGER, precio_compra DOUBLE, precio_venta DOUBLE)';
+        Qry.SQL.Text:= SQL;
+        Qry.ExecSQL;
+
+        SQL:= 'CREATE TABLE IF NOT EXISTS proveedores(id INTEGER PRIMARY KEY, nombre TEXT, ' +
+        'apellido TEXT, edad INTEGER, sexo TEXT)';
+        Qry.SQL.Text:= SQL;
+        Qry.ExecSQL;
+
+        SQL:= 'CREATE TABLE IF NOT EXISTS gerentes(id INTEGER PRIMARY KEY, nombre TEXT, ' +
+        'apellido TEXT, edad INTEGER, sexo TEXT)';
+        Qry.SQL.Text:= SQL;
+        Qry.ExecSQL;
+
+        Result:= True;
+      except on E: exception do
+        begin
+          EscribirLogExcepciones(E.ClassName + ': ' + E.Message);
+          Result:= False;
+        end;
+      end;
+    finally
+      Qry.Close;
+      FreeAndNil(Qry);
+    end;
+  end else Result:= False;
+end;
+
+function ConectarDB(Conexion: TFDConnection): boolean;
+var
+  DBFilePath: string;
+begin
+  DBFilePath:= ExtractFileDir(ParamStr(0)) + PathDelim + 'database.db';
+  try
+    Conexion.Params.Values['Database']:= DBFilePath;
+    Conexion.Params.Values['DriverID']:= 'SQLite';
+    Conexion.Connected:= True;
+    Result:= True;
+  except on E: exception do
+    begin
+      EscribirLogExcepciones(E.ClassName + ': ' + E.Message);
+      Result:= False;
+    end;
+  end;
+end;
+
+end.

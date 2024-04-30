@@ -1,0 +1,427 @@
+unit DB_Actions;
+
+interface
+uses
+  System.Classes, System.Types, System.SysConst, System.SysUtils, System.StrUtils,
+  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.Stan.Param,
+  FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool,
+  FireDAC.Stan.Async, FireDAC.Phys, FireDAC.Phys.SQLite, FireDAC.Phys.SQLiteDef,
+  FireDAC.Stan.ExprFuncs, FireDAC.Phys.SQLiteWrapper.Stat, URecords,
+  {$IFDEF MSWINDOWS} FireDAC.VCLUI.Wait, {$ENDIF}
+  FireDAC.DApt, Data.DB, FireDAC.Comp.Client;
+
+function CrearTablas(Conexion: TFDConnection): boolean;
+function ConectarDB(Conexion: TFDConnection): boolean;
+
+(*
+  SE SUPONE QUE HASTA ESTE PUNTO "CONEXIÓN" SE ENCUENTRA
+  CON UNA CONEXIÓN ESTABLECIDA CON LA BASE DE DATOS...
+  DE LO CONTRARIO, LA APP SE TUVO QUE HABER FINALIZADO
+
+  PARA ESTE EJEMPLO SE HIZO ASÍ POR CUESTIONES DE TIEMPO
+*)
+
+function InsertarCliente(Qry: TFDQuery; ID: integer;
+Nombre, Apellido:string; Edad: integer; Sexo: string): boolean;
+
+function InsertarProveedor(Qry: TFDQuery; ID: integer;
+Nombre, Apellido:string; Edad: integer; Sexo: string): boolean;
+
+function InsertarGerente(Qry: TFDQuery; ID: integer;
+Nombre, Apellido:string; Edad: integer; Sexo: string): boolean;
+
+function InsertarProducto(Qry: TFDQuery; ID: integer;
+Descripcion: string; Existencia: integer; Precio_Compra, Precio_Venta: Double): boolean;
+
+function InsercionMultiple(Conexion: TFDConnection; SQL: string): boolean;
+procedure LimpiarTabla(Conexion:TFDConnection; Tabla: string);
+function ObtenerClientes_DB(Conexion: TFDConnection): AClientes;
+function ObtenerProveedores_DB(Conexion: TFDConnection): AProveedores;
+function ObtenerGerentes_DB(Conexion: TFDConnection): AGerentes;
+function ObtenerProductos_DB(Conexion: TFDConnection): AProductos;
+
+implementation
+uses
+  Generales, System.IOUtils;
+
+function CrearTablas(Conexion: TFDConnection): boolean;
+var
+  Qry: TFDQuery;
+  SQL: string;
+begin
+  if ConectarDB(Conexion) then
+  begin
+    Qry:= TFDQuery.Create(nil);
+    try
+      try
+        Qry.Connection:= Conexion;
+        Qry.SQL.Clear;
+        SQL:= 'CREATE TABLE IF NOT EXISTS clientes(id INTEGER PRIMARY KEY, nombre TEXT, ' +
+        'apellido TEXT, edad INTEGER, sexo TEXT)';
+        Qry.SQL.Text:= SQL;
+        Qry.ExecSQL;
+
+        SQL:= 'CREATE TABLE IF NOT EXISTS productos(id INTEGER PRIMARY KEY, ' +
+        'descripcion TEXT, existencia INTEGER, precio_compra DOUBLE, precio_venta DOUBLE)';
+        Qry.SQL.Text:= SQL;
+        Qry.ExecSQL;
+
+        SQL:= 'CREATE TABLE IF NOT EXISTS proveedores(id INTEGER PRIMARY KEY, nombre TEXT, ' +
+        'apellido TEXT, edad INTEGER, sexo TEXT)';
+        Qry.SQL.Text:= SQL;
+        Qry.ExecSQL;
+
+        SQL:= 'CREATE TABLE IF NOT EXISTS gerentes(id INTEGER PRIMARY KEY, nombre TEXT, ' +
+        'apellido TEXT, edad INTEGER, sexo TEXT)';
+        Qry.SQL.Text:= SQL;
+        Qry.ExecSQL;
+
+        Result:= True;
+      except on E: exception do
+        begin
+          EscribirLogExcepciones(E.ClassName + ': ' + E.Message);
+          Result:= False;
+        end;
+      end;
+    finally
+      Qry.Close;
+      FreeAndNil(Qry);
+    end;
+  end else Result:= False;
+end;
+
+function ConectarDB(Conexion: TFDConnection): boolean;
+var
+  DBFilePath: string;
+begin
+  DBFilePath:=
+  {$IFDEF MSWINDOWS}
+  ExtractFileDir(ParamStr(0)) + PathDelim + 'database.db'
+  {$ENDIF}
+  {$IFDEF ANDROID}
+  TPath.GetDocumentsPath + PathDelim + 'database.db';
+  {$ENDIF};
+  try
+    Conexion.Params.Values['Database']:= DBFilePath;
+    Conexion.Params.Values['DriverID']:= 'SQLite';
+    Conexion.Connected:= True;
+    Result:= True;
+  except on E: exception do
+    begin
+      EscribirLogExcepciones(E.ClassName + ': ' + E.Message);
+      Result:= False;
+    end;
+  end;
+end;
+
+function InsertarCliente(Qry: TFDQuery; ID: integer;
+Nombre, Apellido:string; Edad: integer; Sexo: string): boolean;
+var
+  SQL: string;
+begin
+  SQL:= 'INSERT INTO clientes (id, nombre, apellido, edad, sexo)' +
+  ' VALUES (NULL, :nombre, :apellido, :edad, :sexo)';
+  try
+    Qry.SQL.Text:= SQL;
+    Qry.ParamByName('nombre').AsString:= Nombre;
+    Qry.ParamByName('apellido').AsString:= Apellido;
+    Qry.ParamByName('edad').AsInteger:= Edad;
+    Qry.ParamByName('sexo').AsString:= Sexo;
+    Qry.ExecSQL;
+    Result:= True;
+  except on E: exception do
+    begin
+      EscribirLogExcepciones(E.ClassName + ': ' + E.Message);
+      Result:= False;
+    end;
+  end;
+end;
+
+function InsertarProveedor(Qry: TFDQuery; ID: integer;
+Nombre, Apellido:string; Edad: integer; Sexo: string): boolean;
+var
+  SQL: string;
+begin
+  SQL:= 'INSERT INTO proveedores (id, nombre, apellido, edad, sexo)' +
+  ' VALUES (NULL, :nombre, :apellido, :edad, :sexo)';
+  try
+    Qry.SQL.Text:= SQL;
+    Qry.ParamByName('nombre').AsString:= Nombre;
+    Qry.ParamByName('apellido').AsString:= Apellido;
+    Qry.ParamByName('edad').AsInteger:= Edad;
+    Qry.ParamByName('sexo').AsString:= Sexo;
+    Qry.ExecSQL;
+    Result:= True;
+  except on E: exception do
+    begin
+      EscribirLogExcepciones(E.ClassName + ': ' + E.Message);
+      Result:= False;
+    end;
+  end;
+end;
+
+function InsertarGerente(Qry: TFDQuery; ID: integer;
+Nombre, Apellido:string; Edad: integer; Sexo: string): boolean;
+var
+  SQL: string;
+begin
+  SQL:= 'INSERT INTO gerentes (id, nombre, apellido, edad, sexo)' +
+  ' VALUES (NULL, :nombre, :apellido, :edad, :sexo)';
+  try
+    Qry.SQL.Text:= SQL;
+    Qry.ParamByName('nombre').AsString:= Nombre;
+    Qry.ParamByName('apellido').AsString:= Apellido;
+    Qry.ParamByName('edad').AsInteger:= Edad;
+    Qry.ParamByName('sexo').AsString:= Sexo;
+    Qry.ExecSQL;
+    Result:= True;
+  except on E: exception do
+    begin
+      EscribirLogExcepciones(E.ClassName + ': ' + E.Message);
+      Result:= False;
+    end;
+  end;
+end;
+
+function InsertarProducto(Qry: TFDQuery; ID: integer;
+Descripcion: string; Existencia: integer; Precio_Compra, Precio_Venta: Double): boolean;
+var
+  SQL: string;
+begin
+  SQL:= 'INSERT INTO productos (id, descripcion, existencia, precio_compra, ' +
+  'precio_venta) VALUES (NULL, :descripcion, :existencia, :precio_compra, :precio_venta)';
+  try
+    Qry.SQL.Clear;
+    Qry.SQL.Text:= SQL;
+    Qry.ParamByName('descripcion').AsString:= Descripcion;
+    Qry.ParamByName('existencia').AsInteger:= Existencia;
+    Qry.ParamByName('precio_compra').AsFloat:= Precio_Compra;
+    Qry.ParamByName('precio_venta').AsFloat:= Precio_Venta;
+    Qry.ExecSQL;
+    Result:= True;
+  except on E: exception do
+    begin
+      EscribirLogExcepciones(E.ClassName + ': ' + E.Message);
+      Result:= False;
+    end;
+  end;
+end;
+
+function InsercionMultiple(Conexion: TFDConnection; SQL: string): boolean;
+var
+  Qry: TFDQuery;
+begin
+  (*
+    ESTA FUNCIÓN SE ESCRIBIÓ DE ESTA MANERA PARA MOSTRAR COMO EJEMPLO
+    LA EJECUCIÓN DE UNA CONSULTA A UNA BD SIN NECESIDAD DE TENER EL COMPONENTE
+    FDQUERY EN TIEMPO DE DISEÑO EN ALGÚN FORM O DATAMODULE
+  *)
+  Qry:= TFDQuery.Create(nil);
+  try
+    try
+      Qry.Connection:= Conexion;
+      Qry.SQL.Clear;
+      Qry.SQL.Text:= SQL;
+      Qry.ExecSQL;
+      Result:= True;
+    except on E: exception do
+      begin
+        EscribirLogExcepciones(E.ClassName + ': ' + E.Message);
+        Result:= False;
+      end;
+    end;
+  finally
+    Qry.Close;
+    FreeAndNil(Qry);
+  end;
+end;
+
+procedure LimpiarTabla(Conexion:TFDConnection; Tabla: string);
+var
+  SQL: string;
+  Qry: TFDQuery;
+begin
+  SQL:= 'DELETE FROM ' + Tabla;
+  Qry:= TFDQuery.Create(nil);
+  try
+    try
+      Qry.Connection:= Conexion;
+      Qry.SQL.Clear;
+      Qry.SQL.Text:= SQL;
+      Qry.ExecSQL;
+    except on E: exception do
+      begin
+        EscribirLogExcepciones(E.ClassName + ': ' + E.Message);
+      end;
+    end;
+  finally
+    SQL:= string.Empty;
+    Qry.Close;
+    FreeAndNil(Qry);
+  end;
+end;
+
+function ObtenerClientes_DB(Conexion: TFDConnection): AClientes;
+var
+  Qry: TFDQuery;
+  SQL: string;
+begin
+  SQL:= 'SELECT * FROM clientes';
+  Qry:= TFDQuery.Create(nil);
+  try
+    try
+      Qry.Connection:= Conexion;
+      Qry.SQL.Clear;
+      Qry.SQL.Text:= SQL;
+      Qry.Open;
+
+      if Qry.RecordCount > 0 then
+      begin
+        SetLength(Result, 0);
+        Qry.First;
+        while not Qry.Eof do
+        begin    
+          SetLength(Result, Length(Result) + 1);        
+          Result[High(Result)].ID:= Qry.FieldByName('id').AsInteger;
+          Result[High(Result)].Nombre:= Qry.FieldByName('nombre').AsString;
+          Result[High(Result)].Apellido:= Qry.FieldByName('apellido').AsString;
+          Result[High(Result)].Edad:= Qry.FieldByName('edad').AsInteger;
+          Result[High(Result)].Sexo:= Qry.FieldByName('sexo').AsString;
+          Qry.Next;
+        end;
+      end else SetLength(Result, 0);
+    except on E: exception do
+      begin
+        EscribirLogExcepciones(E.ClassName + ': ' + E.Message);
+        SetLength(Result, 0);
+      end;
+    end;
+  finally
+    Qry.Close;
+    FreeAndNil(Qry);
+  end;
+end;
+
+function ObtenerProveedores_DB(Conexion: TFDConnection): AProveedores;
+var
+  Qry: TFDQuery;
+  SQL: string;
+begin
+  SQL:= 'SELECT * FROM proveedores';
+  Qry:= TFDQuery.Create(nil);
+  try
+    try
+      Qry.Connection:= Conexion;
+      Qry.SQL.Clear;
+      Qry.SQL.Text:= SQL;
+      Qry.Open;
+
+      if Qry.RecordCount > 0 then
+      begin
+        SetLength(Result, 0);
+        Qry.First;
+        while not Qry.Eof do
+        begin    
+          SetLength(Result, Length(Result) + 1);        
+          Result[High(Result)].ID:= Qry.FieldByName('id').AsInteger;
+          Result[High(Result)].Nombre:= Qry.FieldByName('nombre').AsString;
+          Result[High(Result)].Apellido:= Qry.FieldByName('apellido').AsString;
+          Result[High(Result)].Edad:= Qry.FieldByName('edad').AsInteger;
+          Result[High(Result)].Sexo:= Qry.FieldByName('sexo').AsString;
+          Qry.Next;
+        end;
+      end else SetLength(Result, 0);
+    except on E: exception do
+      begin
+        EscribirLogExcepciones(E.ClassName + ': ' + E.Message);
+        SetLength(Result, 0);
+      end;
+    end;
+  finally
+    Qry.Close;
+    FreeAndNil(Qry);
+  end;
+end;
+
+function ObtenerGerentes_DB(Conexion: TFDConnection): AGerentes;
+var
+  Qry: TFDQuery;
+  SQL: string;
+begin
+  SQL:= 'SELECT * FROM gerentes';
+  Qry:= TFDQuery.Create(nil);
+  try
+    try
+      Qry.Connection:= Conexion;
+      Qry.SQL.Clear;
+      Qry.SQL.Text:= SQL;
+      Qry.Open;
+
+      if Qry.RecordCount > 0 then
+      begin
+        SetLength(Result, 0);
+        Qry.First;
+        while not Qry.Eof do
+        begin    
+          SetLength(Result, Length(Result) + 1);        
+          Result[High(Result)].ID:= Qry.FieldByName('id').AsInteger;
+          Result[High(Result)].Nombre:= Qry.FieldByName('nombre').AsString;
+          Result[High(Result)].Apellido:= Qry.FieldByName('apellido').AsString;
+          Result[High(Result)].Edad:= Qry.FieldByName('edad').AsInteger;
+          Result[High(Result)].Sexo:= Qry.FieldByName('sexo').AsString;
+          Qry.Next;
+        end;
+      end else SetLength(Result, 0);
+    except on E: exception do
+      begin
+        EscribirLogExcepciones(E.ClassName + ': ' + E.Message);
+        SetLength(Result, 0);
+      end;
+    end;
+  finally
+    Qry.Close;
+    FreeAndNil(Qry);
+  end;
+end;
+
+function ObtenerProductos_DB(Conexion: TFDConnection): AProductos;
+var
+  Qry: TFDQuery;
+  SQL: string;
+begin
+  SQL:= 'SELECT * FROM productos';
+  Qry:= TFDQuery.Create(nil);
+  try
+    try
+      Qry.Connection:= Conexion;
+      Qry.SQL.Clear;
+      Qry.SQL.Text:= SQL;
+      Qry.Open;
+
+      if Qry.RecordCount > 0 then
+      begin
+        SetLength(Result, 0);
+        Qry.First;
+        while not Qry.Eof do 
+        begin
+          SetLength(Result, Length(Result) + 1);
+          Result[High(Result)].ID:= Qry.FieldByName('id').AsInteger;
+          Result[High(Result)].Descripcion:= Qry.FieldByName('descripcion').AsString;
+          Result[High(Result)].Existencia:= Qry.FieldByName('existencia').AsInteger;
+          Result[High(Result)].Precio_Compra:= Qry.FieldByName('precio_compra').AsFloat;
+          Result[High(Result)].Precio_Venta:= Qry.FieldByName('precio_venta').AsFloat;
+          Qry.Next;
+        end;
+      end else SetLength(Result, 0);
+    except on E: exception do
+      begin
+        EscribirLogExcepciones(E.ClassName + ': ' + E.Message);
+        SetLength(Result, 0);
+      end;
+    end;
+  finally
+
+  end;
+end;
+
+end.

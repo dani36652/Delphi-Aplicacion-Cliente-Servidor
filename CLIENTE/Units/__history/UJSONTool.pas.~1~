@@ -1,0 +1,16 @@
+unit UJSONTool;
+
+interface
+uses
+  System.Classes, System.Types, System.SysConst, System.SysUtils,
+  System.StrUtils, System.Generics.Collections, System.JSON,
+  System.JSON.Types, System.JSON.Converters, System.JSON.Builders;
+
+type TJSONTool = class(TComponent)
+  private
+  public
+end;
+
+implementation
+
+end.

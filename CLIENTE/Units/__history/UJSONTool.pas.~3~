@@ -1,0 +1,90 @@
+unit UJSONTool;
+
+interface
+uses
+  URecords, URest,
+  System.Classes, System.Types, System.SysConst, System.SysUtils,
+  System.StrUtils, System.Generics.Collections, System.JSON,
+  System.JSON.Types, System.JSON.Converters, System.JSON.Builders;
+
+type TJSONTool = class(TComponent)
+  private
+    BaseURL: string;
+  public
+    function ObtenerClientes: AClientes;
+    function ObtenerProveedores: AProveedores;
+    function ObtenerGerentes: AGerentes;
+    function ObtenerProductos: AProductos;
+    function CheckConnection: boolean;
+    property URLServidor: string read BaseURL write BaseURL;
+end;
+
+implementation
+uses
+  Generales;
+
+{ TJSONTool }
+
+function TJSONTool.CheckConnection: boolean;
+var
+  REST: TREST;
+begin
+  REST:= TREST.Create(nil);
+  try
+    try
+      REST.SetBaseURL(BaseURL);
+      REST.GET('', 'checkconnection');
+      Result:= REST.Respuesta.Code = 200;
+    except on E: exception do
+      begin
+        EscribirLogExcepciones(E.ClassName + ': ' + E.Message);
+        Result:= False;
+      end;
+    end;
+  finally
+    FreeAndNil(REST);
+  end;
+end;
+
+function TJSONTool.ObtenerClientes: AClientes;
+var
+  REST: TREST;
+  JSONObj: TJSONObject;
+  JArrayClientes: TJSONArray;
+begin
+  REST:= TREST.Create(nil);
+  try
+    try
+      REST.SetBaseURL(BaseURL);
+      REST.GET('', 'clientes');
+      if REST.Respuesta.Code = 200 then
+      begin
+
+      end else SetLength(Result, 0);
+    except on E: exception do
+      begin
+        EscribirLogExcepciones(E.ClassName + ': ' + E.Message);
+        SetLength(Result, 0);
+      end;
+    end;
+  finally
+    FreeAndNil(REST); //Liberar en memoria
+  end;
+end;
+
+function TJSONTool.ObtenerGerentes: AGerentes;
+begin
+
+end;
+
+function TJSONTool.ObtenerProductos: AProductos;
+begin
+
+end;
+
+function TJSONTool.ObtenerProveedores: AProveedores;
+begin
+
+end;
+
+end.

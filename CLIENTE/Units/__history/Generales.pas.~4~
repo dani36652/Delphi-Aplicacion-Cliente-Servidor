@@ -1,0 +1,66 @@
+unit Generales;
+
+interface
+uses
+  {$IFDEF ANDROID}
+  Androidapi.JNI.Webkit, FMX.VirtualKeyboard,
+  Androidapi.JNI.Print, Androidapi.JNI.Util,
+  fmx.Platform.Android,
+  Androidapi.jni,fmx.helpers.android, Androidapi.Jni.app,
+  Androidapi.Jni.GraphicsContentViewText, Androidapi.JniBridge,
+  Androidapi.JNI.Os, Androidapi.Jni.Telephony,
+  Androidapi.JNI.JavaTypes,Androidapi.Helpers,
+  Androidapi.JNI.Widget,System.Permissions,
+  FMX.DialogService,Androidapi.Jni.Provider,Androidapi.Jni.Net,
+  fmx.TextLayout,AndroidAPI.JNI.Support,
+  {$ENDIF}
+  System.Classes, FMX.Forms, FMX.Platform, System.Messaging, FMX.Objects,
+  IdGlobal,{$IFDEF MSWINDOWS} IdHTTP, WinApi.UrlMon, Winapi.ShellAPI,
+  Winapi.Windows, FMX.Platform.Win,{$ENDIF} FMX.ComboEdit, FMX.NumberBox,
+  System.Types, System.StrUtils, FMX.Dialogs, System.SysUtils, System.UITypes,
+  FMX.Types, FMX.Controls;
+
+procedure Sincronizar(AProc: TProc);
+procedure EscribirLogExcepciones(Mensaje: string);
+
+implementation
+uses
+  System.IOUtils;
+
+procedure Sincronizar(AProc: TProc);
+begin
+  TThread.Synchronize(nil,
+  procedure
+  begin
+    AProc;
+  end);
+end;
+
+procedure EscribirLogExcepciones(Mensaje: string);
+var
+  FileName: string;
+  F: TextFile;
+begin
+  // Esto evita el error IO32 por múltiple acceso al archivo de texto del Log
+  Sincronizar(
+    procedure
+    begin
+      FileName :=
+      {$IFDEF MSWINDOWS}
+      TPath.Combine(ExtractFilePath(ParamStr(0)), 'LogExcepciones.txt')
+      {$ENDIF}
+      {$IFDEF ANDROID}
+      TPath.GetDocumentsPath + PathDelim + 'LogExcepciones.txt';
+      {$ENDIF};
+      AssignFile(F, FileName);
+      if FileExists(FileName) then
+        Append(F)
+      else
+        Rewrite(F);
+      writeln(F, FormatDateTime('DD/MM/YYYY hh:nn:ss', Now) + '-Excepción: '
+        + Mensaje);
+      CloseFile(F);
+    end);
+end;
+
+end.

@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2024/04/24 10:22:33.000.516,=C:\Users\drodriguez\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2024/04/24 10:39:12.000.240,=C:\Users\drodriguez\Documents\Embarcadero\Studio\Projects\WebModuleUnit1.pas</Transaction>
+    <Transaction>2024/04/24 10:40:01.000.677,=C:\Users\drodriguez\Documents\Embarcadero\Studio\Projects\WebModuleUnit1.pas</Transaction>
+    <Transaction>2024/04/24 10:40:01.000.424,=C:\Users\drodriguez\Documents\Embarcadero\Studio\Projects\FormUnit1.pas</Transaction>
+    <Transaction>2024/04/24 10:40:34.000.788,C:\Users\drodriguez\Documents\Embarcadero\Studio\Projects\UServer.dfm=C:\Users\drodriguez\Documents\Embarcadero\Studio\Projects\FormUnit1.dfm</Transaction>
+    <Transaction>2024/04/24 10:40:34.000.788,C:\Users\drodriguez\Documents\Embarcadero\Studio\Projects\UServer.pas=C:\Users\drodriguez\Documents\Embarcadero\Studio\Projects\FormUnit1.pas</Transaction>
+    <Transaction>2024/04/24 10:40:56.000.586,C:\Users\drodriguez\Documents\Embarcadero\Studio\Projects\WebModule.dfm=C:\Users\drodriguez\Documents\Embarcadero\Studio\Projects\WebModuleUnit1.dfm</Transaction>
+    <Transaction>2024/04/24 10:40:56.000.586,C:\Users\drodriguez\Documents\Embarcadero\Studio\Projects\WebModule.pas=C:\Users\drodriguez\Documents\Embarcadero\Studio\Projects\WebModuleUnit1.pas</Transaction>
+    <Transaction>2024/04/24 10:43:47.000.601,C:\Users\drodriguez\Documents\Embarcadero\Studio\Projects\WebServer.dproj=C:\Users\drodriguez\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2024/04/24 10:59:32.000.939,C:\Users\drodriguez\Desktop\Ta\ServerData_Example\SERVER\UServer.pas=C:\Users\drodriguez\Documents\Embarcadero\Studio\Projects\UServer.pas</Transaction>
+    <Transaction>2024/04/24 10:59:32.000.939,C:\Users\drodriguez\Desktop\Ta\ServerData_Example\SERVER\UServer.dfm=C:\Users\drodriguez\Documents\Embarcadero\Studio\Projects\UServer.dfm</Transaction>
+    <Transaction>2024/04/24 10:59:34.000.467,C:\Users\drodriguez\Desktop\Ta\ServerData_Example\SERVER\WebModule.pas=C:\Users\drodriguez\Documents\Embarcadero\Studio\Projects\WebModule.pas</Transaction>
+    <Transaction>2024/04/24 10:59:34.000.467,C:\Users\drodriguez\Desktop\Ta\ServerData_Example\SERVER\WebModule.dfm=C:\Users\drodriguez\Documents\Embarcadero\Studio\Projects\WebModule.dfm</Transaction>
+    <Transaction>2024/04/24 10:59:36.000.791,C:\Users\drodriguez\Desktop\Ta\ServerData_Example\SERVER\WebServer.dproj=C:\Users\drodriguez\Documents\Embarcadero\Studio\Projects\WebServer.dproj</Transaction>
+    <Transaction>2024/04/24 11:07:04.000.906,=C:\Users\drodriguez\Desktop\Ta\ServerData_Example\SERVER\Unit1.pas</Transaction>
+    <Transaction>2024/04/24 11:17:05.000.906,C:\Users\drodriguez\Desktop\Ta\ServerData_Example\SERVER\Units\UGeneral.pas=C:\Users\drodriguez\Desktop\Ta\ServerData_Example\SERVER\Unit1.pas</Transaction>
+    <Transaction>2024/04/24 11:17:35.000.643,C:\Users\drodriguez\Desktop\Ta\ServerData_Example\SERVER\Units\Generales.pas=C:\Users\drodriguez\Desktop\Ta\ServerData_Example\SERVER\Units\UGeneral.pas</Transaction>
+    <Transaction>2024/04/24 11:30:09.000.671,=C:\Users\drodriguez\Desktop\Ta\ServerData_Example\SERVER\Unit1.pas</Transaction>
+    <Transaction>2024/04/24 12:16:14.000.923,C:\Users\drodriguez\Desktop\Ta\ServerData_Example\SERVER\DB.pas=C:\Users\drodriguez\Desktop\Ta\ServerData_Example\SERVER\Unit1.pas</Transaction>
+    <Transaction>2024/04/24 12:17:01.000.412,C:\Users\drodriguez\Desktop\Ta\ServerData_Example\SERVER\UDB_Utils.Generales=C:\Users\drodriguez\Desktop\Ta\ServerData_Example\SERVER\DB.Generales</Transaction>
+    <Transaction>2024/04/24 12:17:14.000.827,C:\Users\drodriguez\Desktop\Ta\ServerData_Example\SERVER\UDB_Utils.Generales=C:\Users\drodriguez\Desktop\Ta\ServerData_Example\SERVER\UDB_Utils.Generales</Transaction>
+    <Transaction>2024/04/24 12:17:29.000.100,C:\Users\drodriguez\Desktop\Ta\ServerData_Example\SERVER\Units\UDB_Utils.pas=C:\Users\drodriguez\Desktop\Ta\ServerData_Example\SERVER\UDB_Utils.pas</Transaction>
+    <Transaction>2024/04/24 12:25:47.000.996,C:\Users\drodriguez\Desktop\Ta\ServerData_Example\SERVER\Units\DB_Actions.pas=C:\Users\drodriguez\Desktop\Ta\ServerData_Example\SERVER\Units\UDB_Utils.pas</Transaction>
+    <Transaction>2024/04/24 16:23:44.000.663,=C:\Users\drodriguez\Desktop\Ta\ServerData_Example\SERVER\Unit1.pas</Transaction>
+  </Transactions>
+	<ActiveMobileDevice>
+		<NoProfile Android64="9LYPFMTSXC6HRS45" Android="9LYPFMTSXC6HRS45"/>
+	</ActiveMobileDevice>
+</BorlandProject>
